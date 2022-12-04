@@ -1,0 +1,700 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Car Rental Service 3.0",
+    "description": "Cервіс для прокату авто. Користувачі сервісу можуть бути двох рівнів – адміністратори та пасажири. Адміністратори можуть додавати та видаляти авто із системи, редагувати інформацію про авто. Пасажири можуть переглядати каталог та бронювати авто на певний час.",
+    "version": "1.0.11"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/swagger"
+    }
+  ],
+  "paths": {
+    "/cars": {
+      "get": {
+        "summary": "Method for obtaining a list of all cars",
+        "tags": [
+          "cars"
+        ],
+        "operationId": "getAllCars",
+        "responses": {
+          "200": {
+            "description": "The request was completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/cars"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "The method of creating a new car",
+        "tags": [
+          "car"
+        ],
+        "operationId": "createCar",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "$ref": "#/components/schemas/car"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/car"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/car/{carId}": {
+      "get": {
+        "summary": "Method for obtaining a car by Id",
+        "tags": [
+          "car"
+        ],
+        "operationId": "getCarById",
+        "parameters": [
+          {
+            "name": "carId",
+            "in": "path",
+            "required": true,
+            "description": "Car Id",
+            "schema": {
+              "type": "string",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/car"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "The method of removing a car by Id",
+        "tags": [
+          "car"
+        ],
+        "operationId": "deleteCarById",
+        "parameters": [
+          {
+            "name": "carId",
+            "in": "path",
+            "required": true,
+            "description": "Car Id",
+            "schema": {
+              "type": "string",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was completed successfully",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Method of editing car data by Id",
+        "tags": [
+          "car"
+        ],
+        "operationId": "updateCarById",
+        "parameters": [
+          {
+            "name": "carId",
+            "in": "path",
+            "required": true,
+            "description": "Car Id",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/car"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update Succesfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/car"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "summary": "Method for obtaining a car by Id",
+        "tags": [
+          "user"
+        ],
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User Id",
+            "schema": {
+              "type": "string",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "The method of removing a user by Id",
+        "tags": [
+          "user"
+        ],
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User Id",
+            "schema": {
+              "type": "string",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was completed successfully",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Method of editing user data by Id",
+        "tags": [
+          "user"
+        ],
+        "operationId": "updateUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User Id",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/user"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update Succesfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/user"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "post": {
+        "summary": "The method of creating a new user",
+        "tags": [
+          "user"
+        ],
+        "operationId": "createUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "$ref": "#/components/schemas/user"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rental/{idrental}": {
+      "get": {
+        "summary": "Method for obtaining a rental by Id",
+        "tags": [
+          "rental"
+        ],
+        "operationId": "getRentalById",
+        "parameters": [
+          {
+            "name": "idrental",
+            "in": "path",
+            "required": true,
+            "description": "Rental Id",
+            "schema": {
+              "type": "string",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rental"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "The method of removing a rental by Id",
+        "tags": [
+          "rental"
+        ],
+        "operationId": "deleteRental",
+        "parameters": [
+          {
+            "name": "idrental",
+            "in": "path",
+            "required": true,
+            "description": "Rental Id",
+            "schema": {
+              "type": "string",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request was completed successfully",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Method of editing rental data by Id",
+        "tags": [
+          "rental"
+        ],
+        "operationId": "updateRentalById",
+        "parameters": [
+          {
+            "name": "idrental",
+            "in": "path",
+            "required": true,
+            "description": "Rental Id",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/rental"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update Succesfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/rental"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rental": {
+      "post": {
+        "summary": "The method of creating a new rental",
+        "tags": [
+          "rental"
+        ],
+        "operationId": "createRental",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "$ref": "#/components/schemas/rental"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rental"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "car": {
+        "required": [
+          "status",
+          "fuelСonsumption"
+        ],
+        "type": "object",
+        "properties": {
+          "idcar": {
+            "type": "integer",
+            "format": "int64",
+            "example": 198772
+          },
+          "model": {
+            "type": "string",
+            "example": "X5"
+          },
+          "fuelСonsumption": {
+            "type": "number",
+            "format": "double",
+            "example": 10.7
+          },
+          "status": {
+            "type": "string",
+            "description": "Car Status",
+            "example": "free",
+            "enum": [
+              "free",
+              "reserve"
+            ]
+          }
+        }
+      },
+      "rental": {
+        "required": [
+          "idrental",
+          "startTime",
+          "endTime"
+        ],
+        "type": "object",
+        "properties": {
+          "idrental": {
+            "type": "integer",
+            "format": "int64",
+            "example": 54
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28.000Z"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2017-07-21T17:32:28.000Z"
+          },
+          "price": {
+            "type": "integer",
+            "format": "int64",
+            "example": 2000
+          }
+        }
+      },
+      "cars": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/car"
+        }
+      },
+      "user": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 10
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "James"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@email.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "k0934985162gfh"
+          },
+          "username": {
+            "type": "string",
+            "example": "John"
+          }
+        }
+      },
+      "Error": {
+        "required": [
+          "code",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "car": {
+        "description": "Car object that needs to be added to the service list",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/car"
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/car"
+            }
+          }
+        }
+      }
+    }
+  }
+}
