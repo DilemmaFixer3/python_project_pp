@@ -2,14 +2,13 @@ from flask import *
 #from flask_mysql_connector import *
 
 from waitress import serve
-from sqlalchemy import create_engine
+from sqlalchemy import *
 
 from pymysql import *
 from models import *
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import bcrypt as bcrypt
-from sqlalchemy import *
 from flask_marshmallow import Marshmallow
 from datetime import datetime
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
@@ -26,7 +25,7 @@ session = sessionmaker(bind=engine)
 s = session()
 
 ma = Marshmallow(app)
-auth = HTTPBasicAuth()
+#auth = HTTPBasicAuth()
 
 #SwaggerUrL
 SWAGGER_URL = '/swagger'
@@ -85,13 +84,13 @@ class RentalSchema(ma.Schema):
 rental_schema = RentalSchema(many=False)
 rentals_schema = RentalSchema(many=True)
 
-@auth.get_user_roles
-def get_user_role(user):
-   return user.role
+# @auth.get_user_roles
+# def get_user_role(user):
+#    return user.role
 
 #User methods
 
-@app.route("/user", methods=["POST"])
+@app.route("/user/register", methods=["POST"])
 def createUser():
     try:
         id = request.json['id']
@@ -120,38 +119,62 @@ def getUserById(id):
     user1 = s.query(user).filter(user.id == id).one()
     return user_schema.jsonify(user1)
 
+@app.route("/user/deleteUser/<int:id>", methods=["DELETE"])
+def getUserById(id):
+    user1 = s.query(user).filter(user.id == id).one()
+    s.delete(user1)
+    s.commit()
+    return user_schema.jsonify(user1)
 
-# @app.route("/user/<int:id>", methods=["PUT"])
-# def updateUserById(id):
-#     user1 = s.query(user).filter(user.id == id).one()
-#     username = user.username
-#     current = auth.username()
-#     if current != Username:
-#         return Response(status=405, response='Access denied')
-#     try:
-#         carId = request.json['carId']
-#         brand = request.json['brand']
-#         model = request.json['model']
-#         maxSpeed = request.json['maxSpeed']
-#         yearProduction = request.json['yearProduction']
-#         fuelConsumption = request.json['fuelConsumption']
-#         seatsNumber = request.json['seatsNumber']
-#         status = request.json['status']
-#         RentalService_serviceId = request.json['serviceId']
-#
-#         car.carId = carId
-#         car.brand = brand
-#         car.model = model
-#         car.maxSpeed = maxSpeed
-#         car.yearProduction = yearProduction
-#         car.fuelConsumption = fuelConsumption
-#         car.seatsNumber = seatsNumber
-#         car.status = status
-#         car.RentalService_serviceId = RentalService_serviceId
-#
-#         s.commit()
-#
-#     except Exception as e:
-#         return jsonify({"Error": "Invalid Request, please try again."})
-#
-#     return Car_schema.jsonify(car)
+@app.route("/user/editingUser/<int:id>", methods=["PUT"])
+def updateUserById(id):
+    user1 = s.query(user).filter(user.id == id).one()
+    try:
+
+        id = request.json['id']
+        firstName = request.json['firstName']
+        lastName = request.json['lastName']
+        email = request.json['email']
+        username = request.json['username']
+        password = request.json['password']
+
+
+        user1.id = id
+        user1.firstName = firstName
+        user1.lastName = lastName
+        user1.email = email
+        user1.username = username
+        user1.password = password
+
+        s.commit()
+    except Exception as e:
+        return jsonify({"Error": "Invalid request, please try again."})
+
+    return user_schema.jsonify(user1)
+
+#Rental_methods
+
+@app.route("/rental/create", methods=["POST"])
+def createRental():
+    try:
+        idrental = request.json['idrental']
+        startTime = request.json['startTime']
+        endTime = request.json['endTime']
+        price = request.json['price']
+        user_id = request.json['user_id']
+        car_idcar = request.json['car_idcar']
+
+        new_rental = rental(idrental=idrental,
+                        startTime=datetime.strptime(startTime, "%Y-%m-%d %H:%M"),
+                        endTime=datetime.strptime(endTime, "%Y-%m-%d %H:%M"),
+                        price=price,
+                        user_id = user_id,
+                        car_idcar=car_idcar)
+
+        s.add(new_rental)
+        s.commit()
+        return user_schema.jsonify(new_rental)
+
+    except Exception as e:
+        return jsonify({"Error": "Invalid Request, please try again."})
+
