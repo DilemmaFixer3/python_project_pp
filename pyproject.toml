@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "pyproject-toml"
+version = "0.1.0"
+description = "-"
+authors = ["DilemmaFixer3 <miroslava.babiychuk@gmail.com>"]
+license = "-"
+readme = "README.md"
+packages = [{include = "pyproject"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

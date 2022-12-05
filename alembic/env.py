@@ -12,7 +12,7 @@ config.set_section_option(
     "mysql+pymysql://root:mira0369B@localhost:3306/mydb02"
 )
 
-from main import *
+from models import *
 target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:

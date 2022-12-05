@@ -1,13 +1,11 @@
-from main import *
-#from main import Base
+#from main import *
+from Base import Base
 import datetime
-from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import relationship
 
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
-Base = declarative_base()
-Base.metadata.create_all(engine)
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Enum
+
 
 class user(Base):
     __tablename__ = 'user'

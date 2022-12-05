@@ -396,7 +396,7 @@
         }
       }
     },
-    "/rental/{idrental}": {
+    "/rental/{startTime}/{endTime}/{idrental}": {
       "get": {
         "summary": "Method for obtaining a rental by Id",
         "tags": [
@@ -412,6 +412,26 @@
             "schema": {
               "type": "string",
               "example": 10
+            }
+          },
+          {
+            "name": "startTime",
+            "in": "path",
+            "required": true,
+            "description": "start rental time",
+            "schema": {
+              "type": "string",
+              "example": "2017-07-21T17:32:28.000Z"
+            }
+          },
+          {
+            "name": "endTime",
+            "in": "path",
+            "required": true,
+            "description": "end rental time",
+            "schema": {
+              "type": "string",
+              "example": "2017-07-21T17:32:28.000Z"
             }
           }
         ],
