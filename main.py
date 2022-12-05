@@ -240,6 +240,62 @@ def getAllCars():
     result_set = cars_schema.dump(cars)
     return jsonify(result_set)
 
+#Method_car
+@app.route("/cars/create", methods=["POST"])
+def createCar():
+    try:
+        idcar = request.json['idcar']
+        model = request.json['model']
+        fuelConsumption = request.json['fuelConsumption']
+        status = request.json['status']
+        user_id = request.json['user_id']
+        # password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+        new_car = user(idcar=idcar,
+                       model=model,
+                       fuelConsumption=fuelConsumption,
+                        status=status,
+                        user_id = user_id)
+
+        s.add(new_car)
+        s.commit()
+        return car_schema.jsonify(new_car)
+
+    except Exception as e:
+        return jsonify({"Error": "Invalid Request, please try again."})
+
+@app.route("/car/<int:idcar>", methods=["GET"])
+def getCarById(idcar):
+    car1 = s.query(car).filter(car.idcar == idcar).one()
+    return car_schema.jsonify(car1)
+
+@app.route("/car/deleteCar/<int:idcar>", methods=["DELETE"])
+def deleteCarById(idcar):
+    car1 = s.query(car).filter(car.idcar == idcar).one()
+    s.delete(car1)
+    s.commit()
+    return jsonify({"Success":"Car deleted."})
+
+@app.route("/car/editingCar/<int:idcar>", methods=["PUT"])
+def updateCarById(idcar):
+    car1 = s.query(car).filter(car.idcar == idcar).one()
+    try:
+        model = request.json['model']
+        fuelConsumption = request.json['fuelConsumption']
+        status = request.json['status']
+        user_id = request.json['user_id']
+
+        car1.model=model
+        car1.fuelConsumption=fuelConsumption
+        car1.status =status
+        car1.user_id=user_id
+
+        s.commit()
+    except Exception as e:
+        return jsonify({"Error": "Invalid Request, please try again."})
+
+    return car_schema.jsonify(car1)
+
 if __name__=="__main__":
     #serve(app)
     app.run()
