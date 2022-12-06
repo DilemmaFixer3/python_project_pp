@@ -1,4 +1,6 @@
+from flask_bcrypt import Bcrypt
 from flask import *
+from flask_httpauth import HTTPBasicAuth
 from waitress import serve
 from sqlalchemy import *
 from models import *
@@ -9,18 +11,16 @@ from sqlalchemy.orm import sessionmaker
 from flask_swagger_ui import *
 from sqlalchemy import and_
 
-
+client = Blueprint('client', __name__)
+admin = Blueprint('admin', __name__)
 app = Flask(__name__)
 
-#SQLalchemy
-# Base = declarative_base()
-# engine = create_engine("mysql+pymysql://root:mira0369B@localhost:3306/mydb02", echo=True)
-# Base.metadata.create_all(engine)
 session = sessionmaker(bind=engine)
 s = session()
 
 ma = Marshmallow(app)
-#auth = HTTPBasicAuth()
+auth = HTTPBasicAuth()
+bcrypt = Bcrypt()
 
 #SwaggerUrL
 SWAGGER_URL = '/swagger'
@@ -32,6 +32,8 @@ SWAGGER_BLUEPRINT = get_swaggerui_blueprint(
         'app_name': 'Car Rental Service API'})   #поміняти назву
 app.register_blueprint(SWAGGER_BLUEPRINT, url_prefix=SWAGGER_URL)
 
+app.register_blueprint(client)
+app.register_blueprint(admin)
 # для відловлення помилок при автентифікації
 @app.errorhandler(401)
 def handle_401_error(_error):
@@ -48,6 +50,20 @@ def handle_404_error(_error):
 @app.errorhandler(500)
 def handle_500_error(_error):
     return make_response(jsonify({'error': 'Server error'}), 500)
+
+@auth.verify_password
+def user_auth(username, password):
+    try:
+        user1=s.query(user).filter(user.username == username).one()
+        if user1 and bcrypt.check_password_hash(user1.password, password):
+            return username
+    except:
+        return None
+
+@auth.get_user_roles
+def get_user_roles(username):
+    user1=s.query(user).filter(user.username == username).first()
+    return user1.role
 
 ##########Schemas
 
@@ -93,12 +109,14 @@ def createUser():
         email = request.json['email']
         username = request.json['username']
         password = request.json['password']
-        # password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        hashed_password= bcrypt.generate_password_hash(password)
+        #password= bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utg-8")
+        role = "user"
 
         new_user = user(id=id, firstName=firstName, lastName=lastName,
                         email=email,
                         username = username,
-                        password=password)
+                        password=hashed_password, role=role)
 
         s.add(new_user)
         s.commit()
@@ -109,13 +127,18 @@ def createUser():
 
 
 @app.route("/user/<int:id>", methods=["GET"])
+@auth.login_required(role='admin')
 def getUserById(id):
     user1 = s.query(user).filter(user.id == id).one()
     return user_schema.jsonify(user1)
 
 @app.route("/user/deleteUser/<int:id>", methods=["DELETE"])
+@auth.login_required
 def deleteUser(id):
+    currentUser = auth.current_user()
     user1 = s.query(user).filter(user.id == id).one()
+    if(currentUser.role != 'admin' or (currentUser.role=='admin' and user1.role == 'admin')) and id != currentUser.id:
+        return handle_403_error(1)
     s.delete(user1)
     s.commit()
     return user_schema.jsonify(user1)
@@ -149,8 +172,10 @@ def updateUserById(id):
 #Rental_methods
 
 @app.route("/rental/create", methods=["POST"])
+@auth.login_required
 def createRental():
     try:
+        currentUser = auth.current_user()
         idrental = request.json['idrental']
         startTime = request.json['startTime']
         endTime = request.json['endTime']
@@ -162,7 +187,7 @@ def createRental():
                         startTime=datetime.strptime(startTime, "%Y-%m-%d %H:%M"),
                         endTime=datetime.strptime(endTime, "%Y-%m-%d %H:%M"),
                         price=price,
-                        user_id = user_id,
+                        user_id = currentUser.id,
                         car_idcar=car_idcar)
 
         exists = s.query(rental).filter(and_(rental.startTime >=
@@ -185,15 +210,23 @@ def createRental():
         return jsonify({"Error": "Invalid Request, please try again."})
 
 @app.route("/rental/deleteRental/<int:idrental>", methods=["DELETE"])
+@auth.login_required
 def deleteRental(idrental):
+    user1 = auth.current_user()
     rental1 = s.query(rental).filter(rental.idrental == idrental).one()
+    if rental1.user_id != user1.id:
+        return handle_403_error
     s.delete(rental1)
     s.commit()
     return jsonify({"Success":"Rental deleted."})
 
 @app.route("/rental/editingRental/<int:idrental>", methods=["PUT"])
+@auth.login_required
 def updateRentalById(idrental):
+    user1 = auth.current_user()
     rental1 = s.query(rental).filter(rental.idrental == idrental).one()
+    if rental1.user_id != user1.id:
+        return handle_403_error
     try:
         startTime = request.json['startTime']
         endTime = request.json['endTime']
@@ -242,6 +275,7 @@ def getAllCars():
 
 #Method_car
 @app.route("/cars/create", methods=["POST"])
+@auth.login_required(role='admin')
 def createCar():
     try:
         idcar = request.json['idcar']
@@ -270,6 +304,7 @@ def getCarById(idcar):
     return car_schema.jsonify(car1)
 
 @app.route("/car/deleteCar/<int:idcar>", methods=["DELETE"])
+@auth.login_required(role='admin')
 def deleteCarById(idcar):
     car1 = s.query(car).filter(car.idcar == idcar).one()
     s.delete(car1)
@@ -277,6 +312,7 @@ def deleteCarById(idcar):
     return jsonify({"Success":"Car deleted."})
 
 @app.route("/car/editingCar/<int:idcar>", methods=["PUT"])
+@auth.login_required(role='admin')
 def updateCarById(idcar):
     car1 = s.query(car).filter(car.idcar == idcar).one()
     try:
@@ -297,8 +333,8 @@ def updateCarById(idcar):
     return car_schema.jsonify(car1)
 
 if __name__=="__main__":
-    #serve(app)
-    app.run()
+    serve(app)
+    #app.run()
 
 
 #poetry run waitress-serve --listen=*:8000 main:app
