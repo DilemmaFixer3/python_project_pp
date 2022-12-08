@@ -12,14 +12,20 @@ from flask_swagger_ui import *
 from sqlalchemy import and_
 
 client = Blueprint('client', __name__)
-admin = Blueprint('admin', __name__)
-app = Flask(__name__)
+authAdmin = Blueprint('admin', __name__, url_prefix='/')
+auth = HTTPBasicAuth()
+
+def create_app(test_config=None):
+    global app
+    app = Flask(__name__)
+    return app
+
+app = create_app()
 
 session = sessionmaker(bind=engine)
 s = session()
 
 ma = Marshmallow(app)
-auth = HTTPBasicAuth()
 bcrypt = Bcrypt()
 
 #SwaggerUrL
@@ -29,11 +35,22 @@ SWAGGER_BLUEPRINT = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name': 'Car Rental Service API'})   #поміняти назву
+        'app_name': 'Car Rental Service API'})
 app.register_blueprint(SWAGGER_BLUEPRINT, url_prefix=SWAGGER_URL)
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+    response.headers.add('Access-Control-Allow-Headers', 'Cache-Control')
+    response.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
+    response.headers.add('Access-Control-Allow-Headers', 'Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+    return response
+
 app.register_blueprint(client)
-app.register_blueprint(admin)
+#app.register_blueprint(admin)
 # для відловлення помилок при автентифікації
 @app.errorhandler(401)
 def handle_401_error(_error):
@@ -109,7 +126,7 @@ def createUser():
         email = request.json['email']
         username = request.json['username']
         password = request.json['password']
-        hashed_password= bcrypt.generate_password_hash(password)
+        hashed_password = bcrypt.generate_password_hash(password)
         #password= bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utg-8")
         role = "user"
 
@@ -126,7 +143,7 @@ def createUser():
         return jsonify({"Error": "Invalid Request, please try again."})
 
 
-@app.route("/user/<int:id>", methods=["GET"])
+@auth.route("/user/<int:id>", methods=["GET"])
 @auth.login_required(role='admin')
 def getUserById(id):
     user1 = s.query(user).filter(user.id == id).one()
@@ -141,7 +158,7 @@ def deleteUser(id):
         return handle_403_error(1)
     s.delete(user1)
     s.commit()
-    return user_schema.jsonify(user1)
+    return jsonify({"Success":"User deleted."})
 
 @app.route("/user/editingUser/<int:id>", methods=["PUT"])
 def updateUserById(id):
@@ -246,15 +263,14 @@ def updateRentalById(idrental):
 
     return rental_schema.jsonify(rental1)
 
-@app.route("/rental/<startTime>/<endTime>/<int:idrental>", methods=["GET"])
+@app.route("/rental/<startTime>/<endTime>/<int:car_idcar>", methods=["GET"])
 def getRental():
     try:
         startTime = request.json['startTime']
         endTime = request.json['endTime']
         car_idcar = request.json['car_idcar']
 
-        exists = s.query(rental).filter(and_(rental.startTime >=
-                                             datetime.strptime(startTime, "%Y-%m-%d %H:%M"),
+        exists = s.query(rental).filter(and_(rental.startTime >= datetime.strptime(startTime, "%Y-%m-%d %H:%M"),
                                              rental.endTime <= datetime.strptime(endTime, "%Y-%m-%d %H:%M"),
                                              rental.car_idcar == car_idcar)).first() is not None
 
@@ -288,8 +304,9 @@ def createCar():
         new_car = user(idcar=idcar,
                        model=model,
                        fuelConsumption=fuelConsumption,
-                        status=status,
-                        user_id = user_id)
+                        status=status
+                       #,user_id = user_id
+        )
 
         s.add(new_car)
         s.commit()
@@ -333,8 +350,8 @@ def updateCarById(idcar):
     return car_schema.jsonify(car1)
 
 if __name__=="__main__":
-    serve(app)
-    #app.run()
+    #serve(app)
+    app.run(debug=True)
 
 
 #poetry run waitress-serve --listen=*:8000 main:app
