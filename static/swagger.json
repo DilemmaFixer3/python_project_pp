@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8000/swagger"
+      "url": "/"
     }
   ],
   "paths": {
@@ -421,7 +421,7 @@
             "description": "start rental time",
             "schema": {
               "type": "string",
-              "example": "2017-07-21T17:32:28.000Z"
+              "example": "2015-04-02 08:49:43"
             }
           },
           {
@@ -431,7 +431,7 @@
             "description": "end rental time",
             "schema": {
               "type": "string",
-              "example": "2017-07-21T17:32:28.000Z"
+              "example": "2016-04-02 08:49:43"
             }
           }
         ],
