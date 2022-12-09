@@ -365,7 +365,7 @@
         "requestBody": {
           "required": true,
           "content": {
-            "aplication/json": {
+            "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/user"
               }
@@ -694,6 +694,10 @@
           "username": {
             "type": "string",
             "example": "John"
+          },
+          "role": {
+            "type": "string",
+            "example": "admin"
           }
         }
       },

@@ -1,4 +1,5 @@
 from flask import *
+from flask_bcrypt import Bcrypt
 from waitress import serve
 from sqlalchemy import *
 from models import *
@@ -26,6 +27,7 @@ app = create_app()
 session = sessionmaker(bind=engine)
 s = session()
 
+bcrypt= Bcrypt()
 ma = Marshmallow(app)
 #auth = HTTPBasicAuth()
 
@@ -114,12 +116,13 @@ def createUser():
         email = request.json['email']
         username = request.json['username']
         password = request.json['password']
-        # password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        role = request.json['role']
+        password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
         new_user = user(id=id, firstName=firstName, lastName=lastName,
                         email=email,
                         username = username,
-                        password=password)
+                        password=password, role=role)
 
         s.add(new_user)
         s.commit()

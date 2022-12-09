@@ -13,7 +13,7 @@ class user(Base):
     firstName = Column(String(45), nullable=False)
     lastName = Column(String(45), nullable=False)
     email = Column(String(45), nullable=False)
-    password = Column(Integer, nullable=False)  # додано для ідентифікації
+    password = Column(String(20), nullable=False)  # додано для ідентифікації
     username = Column(String(45), nullable=False)  # додано для ідентифікації
     role = Column(Enum('user', 'admin'), nullable = False, default= 'user')
     rental = relationship("rental", overlaps="rental")
@@ -25,7 +25,7 @@ class car(Base):
     fuelConsumption = Column(Integer(), nullable=False)
     status = Column(String(45), nullable=False)
     rental = relationship("rental", overlaps="rental")
-    user_id = Column(Integer, ForeignKey('user.id'))
+    #user_id = Column(Integer, ForeignKey('user.id'))
 
 
 class rental(Base):
