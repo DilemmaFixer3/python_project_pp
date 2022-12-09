@@ -128,7 +128,7 @@ def createUser():
         password = request.json['password']
         hashed_password = bcrypt.generate_password_hash(password)
         #password= bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utg-8")
-        role = "user"
+        role = request.json['role']
 
         new_user = user(id=id, firstName=firstName, lastName=lastName,
                         email=email,
@@ -143,7 +143,7 @@ def createUser():
         return jsonify({"Error": "Invalid Request, please try again."})
 
 
-@auth.route("/user/<int:id>", methods=["GET"])
+@app.route("/user/<int:id>", methods=["GET"])
 @auth.login_required(role='admin')
 def getUserById(id):
     user1 = s.query(user).filter(user.id == id).one()

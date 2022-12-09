@@ -694,6 +694,10 @@
           "username": {
             "type": "string",
             "example": "John"
+          },
+          "role": {
+            "type": "string",
+            "example": "admin"
           }
         }
       },
